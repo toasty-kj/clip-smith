@@ -2,9 +2,11 @@ use bincode;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sled::Db;
+use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
 pub struct ClipboardEntry {
+    id: String,
     content: String,
     timestamp: DateTime<Utc>,
 }
@@ -24,6 +26,7 @@ impl ClipboardStore {
         let entry = ClipboardEntry {
             content,
             timestamp: Utc::now(),
+            id: Uuid::new_v4().to_string(),
         };
 
         let encoded = bincode::serialize(&entry)?;

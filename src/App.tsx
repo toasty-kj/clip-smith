@@ -6,6 +6,7 @@ import {
   stopMonitorClipboard
 } from './monitor-clipboard'
 import { useState, useEffect } from 'react'
+import ClipBoardList from './components/clip-board-list'
 
 function App() {
   const [clipList, setClipList] = useState<ClipboardHistory[]>([])
@@ -26,14 +27,14 @@ function App() {
     setClipList([])
   }
 
+  const onSelect = (content: string) => {
+    navigator.clipboard.writeText(content)
+  }
+
   return (
     <>
       <main>
-        <ul>
-          {clipList.map((clip) => (
-            <li key={clip.id}>{clip.content}</li>
-          ))}
-        </ul>
+        <ClipBoardList clipBoardList={clipList} onSelect={onSelect} />
       </main>
     </>
   )
