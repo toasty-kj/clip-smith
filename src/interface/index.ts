@@ -1,1 +1,1 @@
-export * from "./clib-board-history.interface";
+export * from './clib-board-history.interface'
