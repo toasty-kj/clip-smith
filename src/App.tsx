@@ -27,19 +27,15 @@ function App() {
   }
 
   return (
-    <main className="container">
-      <button type="submit" onClick={getClipboard}>
-        Get Clipboard
-      </button>
-      <button type="submit" onClick={clearHistory}>
-        clear history
-      </button>
-      <ul>
-        {clipList.map((clip) => (
-          <li key={clip.id}>{clip.content}</li>
-        ))}
-      </ul>
-    </main>
+    <>
+      <main>
+        <ul>
+          {clipList.map((clip) => (
+            <li key={clip.id}>{clip.content}</li>
+          ))}
+        </ul>
+      </main>
+    </>
   )
 }
 
