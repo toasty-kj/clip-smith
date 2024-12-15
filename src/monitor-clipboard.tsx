@@ -1,7 +1,6 @@
 import { readText } from '@tauri-apps/plugin-clipboard-manager'
 import { getClipboardHistory, saveClipboard } from './service'
 
-let prevClipboard: string | null = null
 let monitorInterval: ReturnType<typeof setInterval> | null = null
 
 export const startMonitorClipboard = async () => {
@@ -15,7 +14,6 @@ export const startMonitorClipboard = async () => {
       if (clipboard === prev) return
 
       await saveClipboard(clipboard)
-      prevClipboard = clipboard
     } catch (error) {
       console.error('Clipboard monitoring error:', error)
     }

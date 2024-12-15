@@ -5,57 +5,30 @@ import {
   getClipboardHistory,
   simulatePaste
 } from './service'
-import {
-  startMonitorClipboard,
-  stopMonitorClipboard
-} from './monitor-clipboard'
+import { stopMonitorClipboard } from './monitor-clipboard'
 import { useState, useEffect } from 'react'
 import ClipBoardList from './components/clip-board-list'
 import { Window } from '@tauri-apps/api/window'
-import {
-  isRegistered,
-  register,
-  unregister
-} from '@tauri-apps/plugin-global-shortcut'
+import { unregister } from '@tauri-apps/plugin-global-shortcut'
+import { handleKeyDown, initialize } from './actions'
 
 function App() {
   const [clipList, setClipList] = useState<ClipboardHistory[]>([])
 
   useEffect(() => {
-    const initialize = async () => {
-      try {
-        startMonitorClipboard()
-        await getClipboard()
-
-        const window = Window.getCurrent()
-        const isRegist = await isRegistered('CommandOrControl+Shift+v')
-        if (isRegist) return
-
-        await register('CommandOrControl+Shift+v', async () => {
-          await window.show()
-          await window.setFocus()
-        })
-      } catch (error) {
-        console.error('Initialization error:', error)
-      }
-    }
-
-    initialize()
+    window.addEventListener('keydown', handleKeyDown)
+    initialize(getClipboard)
 
     return () => {
       unregister('CommandOrControl+Shift+V')
       stopMonitorClipboard()
+      window.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
 
   const getClipboard = async () => {
-    const recentClips: ClipboardHistory[] = await getClipboardHistory(10)
+    const recentClips: ClipboardHistory[] = await getClipboardHistory(15)
     setClipList(recentClips)
-  }
-
-  const clearHistory = async () => {
-    await _clearHistory()
-    setClipList([])
   }
 
   const onSelect = async (content: string) => {

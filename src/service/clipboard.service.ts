@@ -4,7 +4,7 @@ import { ClipboardHistory } from '../interface'
 export const getClipboardHistory = async (
   limit: number
 ): Promise<ClipboardHistory[]> => {
-  const clipboardHistory = await invoke('get_recent_clips', { limit })
+  const clipboardHistory = await invoke('get_clips', { limit })
   return clipboardHistory as ClipboardHistory[]
 }
 
@@ -22,4 +22,10 @@ export const consoleLog = async (content: string): Promise<void> => {
 
 export const simulatePaste = async (): Promise<void> => {
   await invoke('simulate_paste', {})
+}
+
+/** get clipboard history for one week */
+export const getRecentClips = async (): Promise<ClipboardHistory[]> => {
+  const recentClips = await invoke('get_recent_clips', {})
+  return recentClips as ClipboardHistory[]
 }

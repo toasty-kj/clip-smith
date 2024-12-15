@@ -21,7 +21,7 @@ impl ClipboardStore {
         Ok(Self { db })
     }
 
-    // エントリーの保存
+    // save clipboard content
     fn save_entry(&self, content: String) -> Result<(), Box<dyn std::error::Error>> {
         let entry = ClipboardEntry {
             content,
@@ -32,7 +32,7 @@ impl ClipboardStore {
         let encoded = bincode::serialize(&entry)?;
         let key = entry.timestamp.timestamp().to_be_bytes();
 
-        // 同じcontentを持つ既存のエントリーを削除
+        // delete existing entry with the same content
         let mut batch = sled::Batch::default();
         for item in self.db.iter() {
             let (existing_key, existing_value) = item?;
@@ -49,15 +49,30 @@ impl ClipboardStore {
         Ok(())
     }
 
-    // 最近のエントリーを取得
-    fn get_recent_entries(
-        &self,
-        limit: usize,
-    ) -> Result<Vec<ClipboardEntry>, Box<dyn std::error::Error>> {
+    // get recent entries
+    fn get_entries(&self, limit: usize) -> Result<Vec<ClipboardEntry>, Box<dyn std::error::Error>> {
         let mut entries = Vec::new();
 
         for item in self.db.iter().rev().take(limit) {
             let (_, value) = item?;
+            let entry: ClipboardEntry = bincode::deserialize(&value)?;
+            entries.push(entry);
+        }
+
+        Ok(entries)
+    }
+
+    // get entries from last week
+    fn get_recent_clips(&self) -> Result<Vec<ClipboardEntry>, Box<dyn std::error::Error>> {
+        let mut entries = Vec::new();
+        let week_ago = Utc::now() - chrono::Duration::days(7);
+        let week_ago_timestamp = week_ago.timestamp().to_be_bytes();
+
+        for item in self.db.iter().rev() {
+            let (key, value) = item?;
+            if key.as_ref() < week_ago_timestamp.as_slice() {
+                break;
+            }
             let entry: ClipboardEntry = bincode::deserialize(&value)?;
             entries.push(entry);
         }
@@ -121,9 +136,9 @@ pub async fn save_clipboard(content: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn get_recent_clips(limit: usize) -> Result<Vec<ClipboardEntry>, String> {
+pub async fn get_clips(limit: usize) -> Result<Vec<ClipboardEntry>, String> {
     let store = ClipboardStore::new().map_err(|e| e.to_string())?;
-    store.get_recent_entries(limit).map_err(|e| e.to_string())
+    store.get_entries(limit).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -136,4 +151,10 @@ pub async fn clear_history() -> Result<(), String> {
 pub fn console_log(content: String) -> Result<(), String> {
     println!("{}", content);
     Ok(())
+}
+
+#[tauri::command]
+pub async fn get_recent_clips() -> Result<Vec<ClipboardEntry>, String> {
+    let store = ClipboardStore::new().map_err(|e| e.to_string())?;
+    store.get_recent_clips().map_err(|e| e.to_string())
 }
