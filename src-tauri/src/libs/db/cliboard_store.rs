@@ -131,3 +131,9 @@ pub async fn clear_history() -> Result<(), String> {
     let store = ClipboardStore::new().map_err(|e| e.to_string())?;
     store.delete_all().map_err(|e| e.to_string())
 }
+
+#[tauri::command]
+pub fn console_log(content: String) -> Result<(), String> {
+    println!("{}", content);
+    Ok(())
+}

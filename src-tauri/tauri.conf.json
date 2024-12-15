@@ -14,7 +14,9 @@
       {
         "title": "clip-smith",
         "width": 200,
-        "height": 600
+        "height": 600,
+        "visible": false,
+        "alwaysOnTop": true
       }
     ],
     "security": {

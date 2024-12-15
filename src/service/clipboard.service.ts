@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
-import { ClipboardHistory } from './interface'
+import { ClipboardHistory } from '../interface'
 
 export const getClipboardHistory = async (
   limit: number
@@ -14,4 +14,12 @@ export const saveClipboard = async (content: string): Promise<void> => {
 
 export const clearHistory = async (): Promise<void> => {
   await invoke('clear_history', {})
+}
+
+export const consoleLog = async (content: string): Promise<void> => {
+  await invoke('console_log', { content })
+}
+
+export const simulatePaste = async (): Promise<void> => {
+  await invoke('simulate_paste', {})
 }

@@ -1,1 +1,1 @@
-export * from './clipboar.service'
+export * from './clipboard.service'
