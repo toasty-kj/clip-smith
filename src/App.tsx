@@ -6,26 +6,29 @@ import {
   simulatePaste
 } from './service'
 import { stopMonitorClipboard } from './monitor-clipboard'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ClipBoardList from './components/clip-board-list'
 import { Window } from '@tauri-apps/api/window'
 import { unregister } from '@tauri-apps/plugin-global-shortcut'
 import { handleKeyDown, initialize } from './actions'
-import { HStack } from '@chakra-ui/react'
-import { Button } from '@chakra-ui/react'
 import { SearchForm } from './components/search-form'
 
 function App() {
   const [clipList, setClipList] = useState<ClipboardHistory[]>([])
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', (event) =>
+      handleKeyDown(event, searchInputRef)
+    )
     initialize(getClipboard, setClipList)
 
     return () => {
       unregister('CommandOrControl+Shift+V')
       stopMonitorClipboard()
-      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keydown', (event) =>
+        handleKeyDown(event, searchInputRef)
+      )
     }
   }, [])
 
@@ -44,7 +47,7 @@ function App() {
   return (
     <>
       <main>
-        <SearchForm />
+        <SearchForm ref={searchInputRef} />
         <ClipBoardList clipBoardList={clipList} onSelect={onSelect} />
       </main>
     </>
