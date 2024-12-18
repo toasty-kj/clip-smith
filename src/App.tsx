@@ -17,7 +17,7 @@ function App() {
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)
-    initialize(getClipboard)
+    initialize(getClipboard, setClipList)
 
     return () => {
       unregister('CommandOrControl+Shift+V')
@@ -27,7 +27,7 @@ function App() {
   }, [])
 
   const getClipboard = async () => {
-    const recentClips: ClipboardHistory[] = await getClipboardHistory(15)
+    const recentClips = await getClipboardHistory(15)
     setClipList(recentClips)
   }
 

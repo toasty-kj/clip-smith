@@ -1,10 +1,15 @@
 import { isRegistered, register } from '@tauri-apps/plugin-global-shortcut'
 import { startMonitorClipboard } from '../monitor-clipboard'
 import { Window } from '@tauri-apps/api/window'
+import { ClipboardHistory } from '../interface'
+import { Dispatch } from 'react'
 
-export const initialize = async (getClipboard: () => Promise<void>) => {
+export const initialize = async (
+  getClipboard: () => Promise<void>,
+  setClipList: Dispatch<React.SetStateAction<ClipboardHistory[]>>
+) => {
   try {
-    startMonitorClipboard()
+    startMonitorClipboard(setClipList)
     await getClipboard()
 
     const window = Window.getCurrent()
