@@ -11,6 +11,9 @@ import ClipBoardList from './components/clip-board-list'
 import { Window } from '@tauri-apps/api/window'
 import { unregister } from '@tauri-apps/plugin-global-shortcut'
 import { handleKeyDown, initialize } from './actions'
+import { HStack } from '@chakra-ui/react'
+import { Button } from '@chakra-ui/react'
+import { SearchForm } from './components/search-form'
 
 function App() {
   const [clipList, setClipList] = useState<ClipboardHistory[]>([])
@@ -41,6 +44,7 @@ function App() {
   return (
     <>
       <main>
+        <SearchForm />
         <ClipBoardList clipBoardList={clipList} onSelect={onSelect} />
       </main>
     </>
