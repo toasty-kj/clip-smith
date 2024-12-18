@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ClipboardHistory } from '../interface'
+import { FuzzyFilterResult } from '../interface'
+import { Highlight } from '@nozbe/microfuzz/react'
 
 interface Props {
-  clipBoardList: ClipboardHistory[]
+  clipBoardList: FuzzyFilterResult[]
   onSelect: (content: string) => void
 }
 
@@ -27,7 +28,7 @@ export default function ClipBoardList({ clipBoardList, onSelect }: Props) {
         case 'Enter':
           event.preventDefault()
           if (clipBoardList[selectedIndex]) {
-            onSelect(clipBoardList[selectedIndex].content)
+            onSelect(clipBoardList[selectedIndex].item.content)
           }
           break
       }
@@ -39,9 +40,9 @@ export default function ClipBoardList({ clipBoardList, onSelect }: Props) {
 
   return (
     <ul>
-      {clipBoardList.map((clip, index) => (
+      {clipBoardList.map(({ item, highlightRanges }, index) => (
         <li
-          key={clip.id}
+          key={item.id}
           className={`
             p-2.5 border-b border-gray-200 cursor-pointer
             hover:bg-blue-200 dark:hover:bg-gray-500 transition-colors
@@ -49,12 +50,16 @@ export default function ClipBoardList({ clipBoardList, onSelect }: Props) {
           `}
           onClick={() => {
             setSelectedIndex(index)
-            onSelect(clip.content)
+            onSelect(item.content)
           }}
         >
-          <div className="truncate text-sm">{clip.content}</div>
+          <Highlight
+            className="truncate text-sm"
+            text={item.content}
+            ranges={highlightRanges}
+          />
           <div className="text-xs text-gray-500">
-            {new Date(clip.timestamp).toLocaleString()}
+            {new Date(item.timestamp).toLocaleString()}
           </div>
         </li>
       ))}
